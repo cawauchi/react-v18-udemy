@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, startTransition } from 'react'
 import { Avatar } from './Avatar'
+import { TaskList } from './TaskList'
 
-type Task = {
+export type Task = {
     id: number
     title: string
     assignee: string
@@ -27,20 +28,24 @@ const generateDummyTasks = (): Task[] => {
         })
 }
 
-const task = generateDummyTasks()
+const tasks = generateDummyTasks()
 
 const filteringAssignee = (assignee: string) => {
     if (assignee === '') return generateDummyTasks()
-    return task.filter((task) => task.assignee === assignee)
+    return tasks.filter((task) => task.assignee === assignee)
 }
 
 export const Transition = () => {
     const [selectedAssignee, setSelectedAssignee] = useState<string>('')
-    const [taskList, setTaskList] = useState<Task[]>(task)
+    const [taskList, setTaskList] = useState<Task[]>(tasks)
 
     const onClickAssignee = (assignee: string) => {
         setSelectedAssignee(assignee)
-        setTaskList(filteringAssignee(assignee))
+        // 緊急性が高くないものに対して囲う
+        // タスクリストのフィルタリングはそこまで緊急性が高くない
+        startTransition(() => {
+            setTaskList(filteringAssignee(assignee))
+        })
     }
     return (
         <div>
@@ -57,15 +62,7 @@ export const Transition = () => {
                 </Avatar>
             </div>
             <button onClick={() => onClickAssignee('')}>リセット</button>
-            {taskList.map((task) => (
-                <div
-                    key={task.id}
-                    style={{ width: '300px', margin: 'auto', background: 'lavender' }}
-                >
-                    <p>タイトル: {task.title}</p>
-                    <p>担当: {task.assignee}</p>
-                </div>
-            ))}
+            <TaskList taskList={taskList} />
         </div>
     )
 }
