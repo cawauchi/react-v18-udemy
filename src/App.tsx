@@ -1,8 +1,13 @@
-import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { useEffect } from 'react';
 
 function App() {
+  console.log("appがレンダリングされた")
+  useEffect(() => {
+    console.log("useEffect")
+    // strictModeだとこれが必ずしも一回だけ実装されるわけではなくなる?
+  },[])
   return (
     <div className="App">
       <header className="App-header">
